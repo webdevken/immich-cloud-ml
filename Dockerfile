@@ -18,6 +18,8 @@ RUN mkdir -p /workspace/ollama_models /workspace/immich_cache /var/log/superviso
 
 # Copy the supervisor configuration into the container
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY start-tailscale.sh /usr/local/bin/start-tailscale.sh
+RUN chmod +x /usr/local/bin/start-tailscale.sh
 
 # Expose ports (Ollama: 11434, Immich ML: 3003)
 EXPOSE 11434 3003
