@@ -6,23 +6,27 @@ echo "Starting tailscale daemon process..."
 Tailscale_PID=$!
 
 # 2. Loop internally until the daemon's local socket is fully responsive
-echo "Waiting for tailscaled daemon to initialize..."
-until tailscale status >/dev/null 2>&1; do
+echo "Waiting for tailscaled socket file to be created..."
+while [ ! -S /var/run/tailscale/tailscaled.sock ]; do
     sleep 1
 done
+# Give the daemon a brief moment to settle its socket listeners
+sleep 2
 
-# 3. Check if we are already logged in via the persistent state file
-if tailscale status | grep -q "Logged in"; then
+echo "Checking Tailscale authentication state..."
+STATUS=$(tailscale status 2>&1)
+
+if echo "$STATUS" | grep -q "Logged in"; then
     echo "Tailscale is already authenticated via persistent storage."
 else
-    # 4. If not logged in, authenticate using the RunPod environment variable key
+    echo "Tailscale is logged out."
     if [ -n "$TS_AUTHKEY" ]; then
-        echo "Authenticating Tailscale with provided auth key..."
-        tailscale up --authkey="$TS_AUTHKEY" --ssh
+        echo "Found TS_AUTHKEY environment variable. Authenticating..."
+        tailscale up --authkey="$TS_AUTHKEY" --ssh --accept-routes
     else
-        echo "WARNING: Tailscale is logged out and no TS_AUTHKEY environment variable was found!"
+        echo "ERROR: TS_AUTHKEY environment variable is empty or missing!"
     fi
 fi
 
-# 5. Bring the tailscaled process back to the foreground so Supervisor tracks it properly
+# Keep the script running attached to the tailscaled PID
 wait $Tailscale_PID
