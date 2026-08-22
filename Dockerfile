@@ -10,8 +10,10 @@ RUN apt-get update && apt-get install -y supervisor curl ca-certificates && \
 # Install Tailscale directly from their official script
 RUN curl -fsSL https://tailscale.com/install.sh | sh
 
-# Install Ollama
-RUN curl -fsSL https://ollama.com/install.sh | sh
+# Manually install Ollama (bypassing the interactive install script)
+RUN curl -L https://ollama.com/download/ollama-linux-amd64.tgz -o /tmp/ollama-linux-amd64.tgz && \
+    tar -C /usr/local -xzf /tmp/ollama-linux-amd64.tgz && \
+    rm /tmp/ollama-linux-amd64.tgz
 
 # Create necessary directories for logging and storage fallbacks
 RUN mkdir -p /workspace/ollama_models /workspace/immich_cache /var/log/supervisor
