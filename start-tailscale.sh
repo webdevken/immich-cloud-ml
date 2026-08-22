@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # 1. Start tailscaled in the background with userspace networking and persistent state
+echo "Starting tailscale daemon process..."
 /usr/sbin/tailscaled --tun=userspace-networking --state=/workspace/tailscale.state &
 Tailscale_PID=$!
 
