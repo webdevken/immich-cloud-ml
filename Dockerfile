@@ -1,4 +1,4 @@
-FROM ghcr.io/immich-app/immich-machine-learning:release-cuda
+FROM ghcr.io/immich-app/immich-machine-learning:v2.41-cuda
 
 # Switch to root to install packages and run supervisor
 USER root
